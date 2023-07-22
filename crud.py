@@ -45,8 +45,12 @@ def add_submenu(db: Session, new_submenu: schemas.Submenu):
     return new_submenu
 
 
-def update_submenu(db: Session):
-    pass
+def update_submenu(db: Session, submenu_id: int, new_name: str):
+    updated_submenu = db.query(models.Submenu).filter(models.Submenu.id == submenu_id)
+    if new_name is not None:
+        updated_submenu.update({'name': new_name})
+        db.commit()
+    return updated_submenu
 
 
 def delete_submenu_by_id(db: Session, submenu_id: int):
@@ -83,8 +87,14 @@ def add_dish(db: Session, new_dish: schemas.Dish):
     return new_dish
 
 
-def update_dish(db: Session):
-    pass
+def update_dish(db: Session, dish_id: int, new_name: str = None, new_price: float = None):
+    updated_submenu = db.query(models.Submenu).filter(models.Dish.id == dish_id)
+    if new_name is not None:
+        updated_submenu.update({'name': new_name})
+    if new_price is not None:
+        updated_submenu.update({'price': new_price})
+    db.commit()
+    return updated_submenu
 
 
 def delete_dish_by_id(db: Session, dish_id: int):

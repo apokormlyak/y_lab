@@ -16,7 +16,7 @@ class Submenu(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
-    dish = Column(Integer, ForeignKey('dish.id'))
+    dish = Column(Integer, ForeignKey('dish.id'), unique=True)
 
 
 class Dish(Base):
