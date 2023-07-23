@@ -1,11 +1,11 @@
 from pydantic import BaseModel
 from models import Menu, Submenu, Dish
-from typing import Union
+from typing import Optional
 
 
 class MenuSchema(BaseModel):
     id: int
-    submenu: Union[int, None] = None
+    submenu: Optional[int]
 
     class Meta:
         orm_model = Menu
@@ -17,7 +17,7 @@ class MenuSchema(BaseModel):
 class SubmenuSchema(BaseModel):
     id: int
     name: str
-    dish: Union[int, None] = None
+    dish: Optional[int]
 
     class Meta:
         orm_model = Submenu
@@ -30,7 +30,7 @@ class DishSchema(BaseModel):
     id: int
     name: str
     price: float
-    description: Union[str, None] = None
+    description: Optional[int]
 
     class Meta:
         orm_model = Dish
