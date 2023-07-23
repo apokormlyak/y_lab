@@ -27,8 +27,3 @@ class Dishes(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, index=True)
     price = Column(Integer, index=True)
-
-
-menu = relationship('menu', backref='submenu')
-submenu = relationship('submenu', backref='dishes')
-

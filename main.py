@@ -92,7 +92,7 @@ def get_dishes(db: Session = Depends(get_db)):
 
 
 @app.post('/menu/submenu/{submenu_id}/dishes/add_dish')
-def add_dish(dish: models.Dish, db: Session = Depends(get_db)):
+def add_dish(dish: models.Dishes, db: Session = Depends(get_db)):
     new_dish = crud.add_dish(db, dish)
     dishes = crud.get_dishes(db)
     return Response(status_code=status.HTTP_200_OK, content=dishes)
