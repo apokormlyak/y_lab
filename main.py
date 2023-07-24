@@ -1,8 +1,10 @@
 from fastapi import FastAPI, status, Depends, HTTPException
 from fastapi.responses import Response
-from . import crud, models, schemas
+import crud
+import models
+import schemas
 from sqlalchemy.orm import Session
-from .database import SessionLocal, engine
+from database import SessionLocal, engine
 from typing import List
 
 

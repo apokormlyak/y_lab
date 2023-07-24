@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from models import Menu, Submenu, Dish
+from models import Menu, Submenu, Dishes
 from typing import Optional
 
 
@@ -33,7 +33,7 @@ class DishSchema(BaseModel):
     description: Optional[int]
 
     class Meta:
-        orm_model = Dish
+        orm_model = Dishes
 
     class Config:
         orm_mode = True

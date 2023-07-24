@@ -1,0 +1,20 @@
+services:
+    postgres:
+        env_file:
+            - environment
+        image: postgres:13.1
+        restart: always
+        ports:
+            - "5439:5432"
+        volumes:
+          - fastapi_db_data:/home/postgresql
+          - fastapi_db_data:/var/log/postgresql
+        networks:
+          - net
+
+networks:
+  net:
+
+volumes:
+    fastapi_db_data:
+        external: true

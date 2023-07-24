@@ -1,0 +1,6 @@
+#   PostgreSQL
+#==========================================
+POSTGRES_DB=my_test
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+PGDATA=/home/postgresql/data

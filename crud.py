@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
-from . import models, schemas
+import models
+import schemas
 
 
 def get_menu(db: Session):
@@ -7,7 +8,7 @@ def get_menu(db: Session):
 
 
 def create_menu(db: Session):
-    new_menu = models.Menu()
+    new_menu = schemas.MenuSchema()
     db.add(new_menu)
     db.commit()
     db.refresh(new_menu)
@@ -20,10 +21,6 @@ def update_menu(db: Session):
 
 def delete_menu(db: Session):
     menu = db.query(models.Menu).all()
-    deleted_submenu = db.query(models.Submenu).all()
-    dishes = db.query(models.Dishes).all()
-    db.delete(dishes)
-    db.delete(deleted_submenu)
     db.delete(menu)
     db.commit()
     return 'Меню удалено'
@@ -38,7 +35,7 @@ def get_submenu_by_id(db: Session, submenu_id: int):
 
 
 def add_submenu(db: Session, new_submenu: schemas.Submenu):
-    new_submenu = models.Submenu(name=new_submenu.name, dish=new_submenu.dish)
+    new_submenu = schemas.SubmenuSchema(name=new_submenu.name, dish=new_submenu.dish)
     db.add(new_submenu)
     db.commit()
     db.refresh(new_submenu)
@@ -55,17 +52,12 @@ def update_submenu(db: Session, submenu_id: int, new_name: str):
 
 def delete_submenu_by_id(db: Session, submenu_id: int):
     deleted_submenu = db.query(models.Submenu).filter(models.Submenu.id == submenu_id).first()
-    submenu_dishes = deleted_submenu.dishes
-    db.delete(submenu_dishes)
-    db.delete(deleted_submenu)
     db.commit()
     return f'Подменю {deleted_submenu.name} удалено'
 
 
 def delete_all_submenu(db: Session):
     deleted_submenu = db.query(models.Submenu).all()
-    dishes = db.query(models.Dishes).all()
-    db.delete(dishes)
     db.delete(deleted_submenu)
     db.commit()
     return 'Все подменю удалены'
@@ -80,7 +72,7 @@ def get_dish_by_id(db: Session, dish_id: int):
 
 
 def add_dish(db: Session, new_dish: schemas.DishSchema):
-    new_dish = models.Dishes(db, new_dish)
+    new_dish = schemas.DishSchema(name=new_dish.name, price=new_dish.price)
     db.add(new_dish)
     db.commit()
     db.refresh(new_dish)
