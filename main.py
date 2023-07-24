@@ -73,6 +73,8 @@ def get_submenu(db: Session = Depends(get_db)):
 def add_submenu(submenu: schemas.SubmenuSchema, db: Session = Depends(get_db)):
     if (crud.get_menu_by_id(db, submenu.menu_id)) is None:
         raise HTTPException(status_code=404, detail='Меню с таким id не существует')
+    if (crud.get_submenu_by_name(db, submenu.name)) is not None:
+        raise HTTPException(status_code=404, detail='Подменю с таким названием уже существует')
     new_submenu = crud.add_submenu(db, submenu)
     submenu = crud.get_submenu(db)
     return submenu
@@ -110,8 +112,8 @@ def get_dishes(db: Session = Depends(get_db)):
 
 @app.post('/submenu/{submenu_id}/dishes/add_dish')
 def add_dish(dish: schemas.DishSchema, db: Session = Depends(get_db)):
-    if (crud.get_dish_by_id(db, dish.submenu_id)) is None:
-        raise HTTPException(status_code=404, detail='Подменю с таким id не существует')
+    if (crud.get_dish_by_name(db, dish.name)) is not None:
+        raise HTTPException(status_code=404, detail='Блюдо с таким названием уже существует')
     new_dish = crud.add_dish(db, dish)
     dishes = crud.get_dishes(db)
     return dishes
@@ -129,7 +131,8 @@ def delete_all_dishes(submenu_id: int, db: Session = Depends(get_db)):
     return 'Все блюда удалены успешны'
 
 
-@app.put('/submenu/{submenu_id}/dishes/{dish_id}/update', response_model=schemas.DishSchema)
-def update_dish(dish_id: int, new_name: str = None, new_price: int = None, db: Session = Depends(get_db)):
-    updated_dish = crud.update_dish(db, dish_id, new_name, new_price)
+@app.put('/dishes/{dish_id}/update')
+def update_dish(submenu_id: int, dish_id: int, new_name: str = None, new_price: int = None,
+                db: Session = Depends(get_db)):
+    updated_dish = crud.update_dish(db, submenu_id, dish_id, new_name, new_price)
     return updated_dish

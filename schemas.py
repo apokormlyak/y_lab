@@ -27,6 +27,7 @@ class SubmenuSchema(BaseModel):
 
 class DishSchema(BaseModel):
     submenu_id: int
+    menu_id: int
     name: str
     price: float
     description: Optional[str]

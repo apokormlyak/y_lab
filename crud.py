@@ -46,12 +46,16 @@ def get_submenu_by_id(db: Session, submenu_id: int):
     return db.query(models.Submenu).filter(models.Submenu.id == submenu_id).first()
 
 
+def get_submenu_by_name(db: Session, name: str):
+    return db.query(models.Submenu).filter(models.Submenu.name == name).first()
+
+
 def add_submenu(db: Session, new_submenu: schemas.SubmenuSchema):
     new_submenu = models.Submenu(name=new_submenu.name, menu_id=new_submenu.menu_id,
                                  description=new_submenu.description)
-    submenu_count = db.query(models.Submenu).count()
-    db.query(models.Menu).filter(models.Menu.id == new_submenu.menu_id).update({'submenu_count': submenu_count})
+    submenu_count = db.query(models.Submenu).filter(models.Submenu.menu_id == new_submenu.menu_id).count()
     db.add(new_submenu)
+    db.query(models.Menu).filter(models.Menu.id == new_submenu.menu_id).update({'submenu_count': submenu_count+1})
     db.commit()
     db.refresh(new_submenu)
     return new_submenu
@@ -67,9 +71,9 @@ def update_submenu(db: Session, submenu_id: int, new_name: str):
 
 def delete_submenu_by_id(db: Session, submenu_id: int):
     menu_id = db.query(models.Submenu).filter(models.Submenu.id == submenu_id).first().menu_id
+    submenu_count = db.query(models.Submenu).filter(models.Submenu.menu_id == menu_id).count()
     deleted_submenu = db.query(models.Submenu).filter(models.Submenu.id == submenu_id).delete()
-    submenu_count = db.query(models.Submenu).count()
-    db.query(models.Menu).filter(models.Menu.id == menu_id).update({'submenu_count': submenu_count})
+    db.query(models.Menu).filter(models.Menu.id == menu_id).update({'submenu_count': submenu_count-1})
     db.commit()
     return {"ok": True}
 
@@ -95,37 +99,39 @@ def get_dish_by_id(db: Session, dish_id: int):
     return db.query(models.Dishes).filter(models.Dishes.id == dish_id).first()
 
 
+def get_dish_by_name(db: Session, name: str):
+    return db.query(models.Dishes).filter(models.Dishes.name == name).first()
+
+
 def add_dish(db: Session, new_dish: schemas.DishSchema):
     new_dish = models.Dishes(name=new_dish.name, price=new_dish.price, description=new_dish.description,
-                             submenu_id=new_dish.submenu_id)
-    menu_id = db.query(models.Submenu).filter(models.Submenu.id == new_dish.submenu_id).first().menu_id
-    dish_count = db.query(models.Dishes).count()
-    db.query(models.Submenu).filter(models.Submenu.id == new_dish.submenu_id).update({'dish_count': dish_count})
-    db.query(models.Menu).filter(models.Menu.id == menu_id).update({'dish_count': dish_count})
+                             submenu_id=new_dish.submenu_id, menu_id=new_dish.menu_id)
+    dish_count = db.query(models.Dishes).filter(models.Dishes.submenu_id == new_dish.submenu_id).count()
     db.add(new_dish)
+    db.query(models.Submenu).filter(models.Submenu.id == new_dish.submenu_id).update({'dish_count': dish_count+1})
+    db.query(models.Menu).filter(models.Menu.id == new_dish.menu_id).update({'dish_count': dish_count+1})
     db.commit()
     db.refresh(new_dish)
     return new_dish
 
 
-def update_dish(db: Session, dish_id: int, new_name: str = None, new_price: float = None):
-    updated_submenu = db.query(models.Dishes).filter(models.Dishes.id == dish_id)
+def update_dish(db: Session, submenu_id: int, dish_id: int, new_name: str, new_price: float):
+    updated_dish = db.query(models.Dishes).filter(models.Dishes.submenu_id == submenu_id, models.Dishes.id == dish_id)
     if new_name is not None:
-        updated_submenu.update({'name': new_name})
-    if new_price is not None:
-        updated_submenu.update({'price': new_price})
+        updated_dish.update({'name': new_name})
+    updated_dish.update({'price': new_price})
     db.commit()
-    return updated_submenu
+    return updated_dish
 
 
 def delete_dish_by_id(db: Session, dish_id: int):
     deleted_dish = db.query(models.Dishes).filter(models.Dishes.id == dish_id)
     submenu = db.query(models.Submenu).filter(models.Submenu.id == deleted_dish.submenu_id).first()
     menu_id = db.query(models.Submenu).filter(models.Submenu.id == submenu.id).first().menu_id
+    dish_count = db.query(models.Dishes).filter(models.Dishes.submenu_id == submenu.id).count()
     deleted_dish.delete()
-    dish_count = db.query(models.Dishes).count()
-    db.query(models.Submenu).filter(models.Submenu.id == submenu.id).update({'dish_count': dish_count})
-    db.query(models.Menu).filter(models.Menu.id == menu_id).update({'dish_count': dish_count})
+    db.query(models.Submenu).filter(models.Submenu.id == submenu.id).update({'dish_count': dish_count-1})
+    db.query(models.Menu).filter(models.Menu.id == menu_id).update({'dish_count': dish_count-1})
     db.commit()
     return {"ok": True}
 
@@ -136,8 +142,8 @@ def delete_all_dishes(db: Session, submenu_id: int):
     menu = db.query(models.Menu).filter(models.Menu.id == del_submenu.menu_id).first()
     submenu_dish_count = del_submenu.dish_count
     menu_dish_count = menu.dish_count
+    dish_count = db.query(models.Submenu).filter(models.Dishes.submenu_id == submenu_id).count()
     del_dishes.delete()
-    dish_count = db.query(models.Submenu).count()
     menu.update({'dish_count': menu_dish_count-dish_count})
     del_submenu.update({'dish_count': submenu_dish_count-dish_count})
     db.commit()
