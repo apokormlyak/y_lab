@@ -4,7 +4,7 @@ from typing import Optional
 
 
 class MenuSchema(BaseModel):
-    name: str
+    title: str
 
     class Meta:
         orm_model = Menu
@@ -14,7 +14,7 @@ class MenuSchema(BaseModel):
 
 
 class SubmenuSchema(BaseModel):
-    name: str
+    title: str
     menu_id: int
     description: Optional[str]
 
@@ -28,7 +28,7 @@ class SubmenuSchema(BaseModel):
 class DishSchema(BaseModel):
     submenu_id: int
     menu_id: int
-    name: str
+    title: str
     price: float
     description: Optional[str]
 

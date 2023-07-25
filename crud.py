@@ -12,15 +12,15 @@ def get_menu_by_id(db: Session, menu_id: int):
 
 
 def create_menu(db: Session, new_menu: schemas.MenuSchema):
-    new_menu = models.Menu(name=new_menu.name)
+    new_menu = models.Menu(title=new_menu.title)
     db.add(new_menu)
     db.commit()
     db.refresh(new_menu)
     return new_menu
 
 
-def update_menu(db: Session, menu_id: int, new_name: str):
-    db.query(models.Menu).filter(models.Menu.id == menu_id).update({'name': new_name})
+def update_menu(db: Session, menu_id: int, title: str):
+    db.query(models.Menu).filter(models.Menu.id == menu_id).update({'title': title})
     db.commit()
     updated_menu = get_menu_by_id(db, menu_id)
     return updated_menu
@@ -46,12 +46,12 @@ def get_submenu_by_id(db: Session, submenu_id: int):
     return db.query(models.Submenu).filter(models.Submenu.id == submenu_id).first()
 
 
-def get_submenu_by_name(db: Session, name: str):
-    return db.query(models.Submenu).filter(models.Submenu.name == name).first()
+def get_submenu_by_name(db: Session, title: str):
+    return db.query(models.Submenu).filter(models.Submenu.title == title).first()
 
 
 def add_submenu(db: Session, new_submenu: schemas.SubmenuSchema):
-    new_submenu = models.Submenu(name=new_submenu.name, menu_id=new_submenu.menu_id,
+    new_submenu = models.Submenu(title=new_submenu.title, menu_id=new_submenu.menu_id,
                                  description=new_submenu.description)
     submenu_count = db.query(models.Submenu).filter(models.Submenu.menu_id == new_submenu.menu_id).count()
     db.add(new_submenu)
@@ -61,10 +61,10 @@ def add_submenu(db: Session, new_submenu: schemas.SubmenuSchema):
     return new_submenu
 
 
-def update_submenu(db: Session, submenu_id: int, new_name: str):
+def update_submenu(db: Session, submenu_id: int, title: str):
     updated_submenu = db.query(models.Submenu).filter(models.Submenu.id == submenu_id)
-    if new_name is not None:
-        updated_submenu.update({'name': new_name})
+    if title is not None:
+        updated_submenu.update({'title': title})
         db.commit()
     return updated_submenu
 
@@ -99,12 +99,12 @@ def get_dish_by_id(db: Session, dish_id: int):
     return db.query(models.Dishes).filter(models.Dishes.id == dish_id).first()
 
 
-def get_dish_by_name(db: Session, name: str):
-    return db.query(models.Dishes).filter(models.Dishes.name == name).first()
+def get_dish_by_name(db: Session, title: str):
+    return db.query(models.Dishes).filter(models.Dishes.title == title).first()
 
 
 def add_dish(db: Session, new_dish: schemas.DishSchema):
-    new_dish = models.Dishes(name=new_dish.name, price=new_dish.price, description=new_dish.description,
+    new_dish = models.Dishes(title=new_dish.title, price=new_dish.price, description=new_dish.description,
                              submenu_id=new_dish.submenu_id, menu_id=new_dish.menu_id)
     dish_count = db.query(models.Dishes).filter(models.Dishes.submenu_id == new_dish.submenu_id).count()
     db.add(new_dish)
@@ -115,10 +115,10 @@ def add_dish(db: Session, new_dish: schemas.DishSchema):
     return new_dish
 
 
-def update_dish(db: Session, submenu_id: int, dish_id: int, new_name: str, new_price: float):
+def update_dish(db: Session, submenu_id: int, dish_id: int, title: str, new_price: float):
     updated_dish = db.query(models.Dishes).filter(models.Dishes.submenu_id == submenu_id, models.Dishes.id == dish_id)
-    if new_name is not None:
-        updated_dish.update({'name': new_name})
+    if title is not None:
+        updated_dish.update({'title': title})
     updated_dish.update({'price': new_price})
     db.commit()
     return updated_dish
